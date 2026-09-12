@@ -137,7 +137,11 @@ function buildArc(cfg) {
     const d = (i - current) % N;
     return d > N / 2 ? d - N : d < -N / 2 ? d + N : d;
   };
-  const reach = () => Math.ceil((innerWidth / 2) / (cardW * 0.55)) + 1;
+  /* A hidden tab or an embedded webview can report a zero viewport. Laying the
+     arc out against that collapses it to three cards, so fall back to a sane
+     width and re-measure once the real one arrives. */
+  const vw = () => innerWidth || document.documentElement.clientWidth || 1280;
+  const reach = () => Math.ceil((vw() / 2) / (cardW * 0.55)) + 1;
 
   function render() {
     const spacing = cardW * 0.55;
@@ -156,11 +160,12 @@ function buildArc(cfg) {
   }
 
   function layout() {
-    const h = stage.getBoundingClientRect().height;
-    const narrow = innerWidth <= 640;
+    const w = vw();
+    const h = stage.getBoundingClientRect().height || 420;
+    const narrow = w <= 640;
     cardW = Math.max(
       narrow ? 120 : 160,
-      Math.min(h * 0.86 * cfg.ratio, innerWidth * (narrow ? 0.42 : 0.62), 330)
+      Math.min(h * 0.86 * cfg.ratio, w * (narrow ? 0.42 : 0.62), 330)
     );
     stage.style.setProperty('--card-w', cardW + 'px');
     render();
@@ -196,10 +201,17 @@ function buildArc(cfg) {
     setTimeout(() => { swiped = false; }, 100);
   });
 
+  const remeasure = () => { layout(); sync(); };
   layout();
   sync();
-  addEventListener('resize', () => { layout(); sync(); });
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) sync(); });
+  addEventListener('resize', remeasure);
+  addEventListener('load', remeasure);
+  /* a tab that loaded in the background gets its real size only once shown */
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) remeasure(); });
+  /* the stage can change height without a window resize — fonts arriving, the
+     section growing, an emulated viewport settling. Cards are absolutely
+     positioned, so re-measuring here cannot feed back into the stage box. */
+  if ('ResizeObserver' in window) new ResizeObserver(remeasure).observe(stage);
 }
 
 /* ═══════════════ featured reels ═══════════════ */
