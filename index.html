@@ -31,6 +31,7 @@
     </a>
     <nav class="nav-links" aria-label="التنقل الرئيسي">
       <a href="#work">الأعمال</a>
+      <a href="#stills-sec">اللقطات</a>
       <a href="#grade" class="opt">الكادر</a>
       <a href="#process" class="opt">الطريقة</a>
       <a class="pill" href="#contact">
@@ -92,8 +93,40 @@
       </div>
       <p class="lede">ثمانية أعمال تختصر المدى: من ليلة حفلة كاملة، إلى فيلم مكتب محاماة، إلى معلومة قانونية مبنية على الجرافيك، إلى طاولة أكل تُصوَّر من فوق.</p>
     </div>
-    <div class="feat" id="featured"></div>
   </div>
+
+  <div class="stage" id="stage">
+    <button class="nav-arrow nav-arrow--prev" id="stagePrev" aria-label="العمل السابق">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="nav-arrow nav-arrow--next" id="stageNext" aria-label="العمل التالي">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <p class="stage-cap" id="stageCap" aria-live="polite"></p>
+</section>
+
+<!-- ══════════════════ STILLS ══════════════════ -->
+<section class="sec stills" id="stills-sec">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <div class="txt">
+        <p class="eyebrow"><span class="mono">Stills</span></p>
+        <h2 class="sec-title">لقطات ثابتة</h2>
+      </div>
+      <p class="lede">ذهب، عطور، أزياء، طعام، وعقار. الكاميرا نفسها، والإضاءة تتغيّر حسب ما يحتاجه الموضوع.</p>
+    </div>
+  </div>
+
+  <div class="stage" id="stills">
+    <button class="nav-arrow nav-arrow--prev" id="stillsPrev" aria-label="الصورة السابقة">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="nav-arrow nav-arrow--next" id="stillsNext" aria-label="الصورة التالية">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <p class="stage-cap" id="stillsCap" aria-live="polite"></p>
 </section>
 
 <!-- ══════════════════ THE FRAME ══════════════════ -->
@@ -212,6 +245,17 @@
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm5.5 14.2c-.2.6-1.2 1.2-1.7 1.2-.5.1-1 .1-1.6-.1-.4-.1-.9-.3-1.5-.6-2.6-1.1-4.3-3.8-4.4-4-.1-.2-1-1.4-1-2.6s.6-1.8.9-2.1c.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.3 0 .5l-.3.5-.3.3c-.1.1-.2.3 0 .5.2.3.7 1.2 1.6 2 1.1.9 1.9 1.2 2.2 1.3.2.1.4.1.5-.1l.8-.9c.2-.2.3-.2.5-.1l2 1c.2.1.3.2.4.3 0 .1 0 .5-.2 1Z"/></svg>
   تواصل معي
 </a>
+
+<!-- ══════════════════ PHOTO LIGHTBOX ══════════════════ -->
+<div class="photobox" id="photoBox" hidden role="dialog" aria-modal="true" aria-label="عرض الصورة">
+  <button class="photobox__close" id="photoClose" aria-label="إغلاق">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <figure class="photobox__frame">
+    <img id="photoImg" alt="">
+    <figcaption class="stage-cap" id="photoCap"></figcaption>
+  </figure>
+</div>
 
 <!-- ══════════════════ PROJECT VIEWER ══════════════════ -->
 <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="عرض العمل">

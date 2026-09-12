@@ -263,3 +263,40 @@ const GRADES = [
     note: 'واجهة تبدأ خطوطًا رمادية وتكتمل حجرًا وظلًّا وضوءًا داخل نفس الكادر، بلا قطع. الجهتان إطاران من نفس اللقطة، بينهما أقل من ثانية.',
   },
 ];
+
+/* ------------------------------------------------------------------
+   لقطات — صور ثابتة من جلسات تصوير سابقة
+   الترتيب متبادل بين المجالات حتى لا يبدو القسم كتلًا متشابهة.
+   ------------------------------------------------------------------ */
+const STILLS = [
+  { slug: 'gold-disc',           cat: 'ذهب',   title: 'قرص وشراريب',        client: 'الركن الثمين' },
+  { slug: 'abaya-black',         cat: 'أزياء', title: 'عباية سوداء',         client: 'دار أزياء' },
+  { slug: 'building-modern',     cat: 'عقار',  title: 'واجهة حديثة',         client: 'مشروع سكني' },
+  { slug: 'food-shrimp-pan',     cat: 'طعام',  title: 'جمبري بالكريمة',      client: 'مطعم' },
+  { slug: 'perfume-smoke',       cat: 'منتج',  title: 'عطر داخل دخان',       client: 'علامة عطور' },
+  { slug: 'interior-living',     cat: 'ديكور', title: 'صالة معيشة',          client: 'تصميم داخلي' },
+  { slug: 'gold-crescent',       cat: 'ذهب',   title: 'هلالان بشراريب',      client: 'الركن الثمين' },
+  { slug: 'abaya-purple',        cat: 'أزياء', title: 'عباية بنفسجية',       client: 'دار أزياء' },
+  { slug: 'building-concept',    cat: 'عقار',  title: 'مبنى The Concept',    client: 'مشروع تجاري' },
+  { slug: 'food-tarts',          cat: 'طعام',  title: 'علبة تارت',           client: 'محل حلويات' },
+  { slug: 'perfume-wood',        cat: 'منتج',  title: 'عطر مع نحت خشبي',     client: 'علامة عطور' },
+  { slug: 'interior-dining',     cat: 'ديكور', title: 'غرفة طعام',           client: 'تصميم داخلي' },
+  { slug: 'gold-teardrop',       cat: 'ذهب',   title: 'دلاية قطرة',          client: 'الركن الثمين' },
+  { slug: 'abaya-blue',          cat: 'أزياء', title: 'عباية زرقاء',         client: 'دار أزياء' },
+  { slug: 'building-sign',       cat: 'عقار',  title: 'واجهة بلوحة العميل',  client: 'مركز تعليمي' },
+  { slug: 'food-calamari',       cat: 'طعام',  title: 'كاليماري مقلي',       client: 'مطعم' },
+  { slug: 'oud-beads',           cat: 'منتج',  title: 'علبة عود',            client: 'علامة عود' },
+  { slug: 'interior-hall',       cat: 'ديكور', title: 'مدخل وكونسول',        client: 'تصميم داخلي' },
+  { slug: 'gold-bust',           cat: 'ذهب',   title: 'قطرة على التمثال',    client: 'الركن الثمين' },
+  { slug: 'abaya-grey',          cat: 'أزياء', title: 'عباية رمادية',        client: 'دار أزياء' },
+  { slug: 'building-white',      cat: 'عقار',  title: 'عمارة بيضاء',         client: 'مشروع سكني' },
+  { slug: 'food-fatteh',         cat: 'طعام',  title: 'فتّة في صندوق العرض', client: 'مطعم' },
+  { slug: 'perfume-podium',      cat: 'منتج',  title: 'عطر على منصّة حجرية', client: 'علامة عطور' },
+  { slug: 'interior-classic',    cat: 'ديكور', title: 'مجلس كلاسيكي',        client: 'تصميم داخلي' },
+  { slug: 'gold-tassel',         cat: 'ذهب',   title: 'كرة وشراريب',         client: 'الركن الثمين' },
+  { slug: 'abaya-red',           cat: 'أزياء', title: 'عباية ببطانة حمراء',  client: 'دار أزياء' },
+  { slug: 'building-n105',       cat: 'عقار',  title: 'مشروع N-105',         client: 'مشروع سكني' },
+  { slug: 'food-shrimp-platter', cat: 'طعام',  title: 'طبق جمبري',           client: 'مطعم' },
+  { slug: 'building-beige',      cat: 'عقار',  title: 'واجهة حجرية',         client: 'مشروع سكني' },
+  { slug: 'gold-oval',           cat: 'ذهب',   title: 'بيضاوي بزاوية',       client: 'الركن الثمين' },
+];

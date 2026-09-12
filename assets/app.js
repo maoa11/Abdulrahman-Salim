@@ -99,25 +99,204 @@ function cardHTML(p, n, small) {
   </a>`;
 }
 
-/* ═══════════════ featured ═══════════════ */
+/* ═══════════════ arc carousel ═══════════════ */
+/* Overlapping arc of portrait cards: the middle one faces you, the rest fall
+   away in scale and turn. Shared by the reel row and the stills row. */
+function buildArc(cfg) {
+  const stage = $(cfg.stage);
+  if (!stage || !cfg.items.length) return;
+
+  const N = cfg.items.length;
+  const SIDE = RTL ? -1 : 1;         // later items sit toward the reading tail
+  const cards = [];
+  let current = 0, cardW = 280, swiped = false;
+
+  cfg.items.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'stage__card';
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-label', cfg.label(item));
+
+    const inner = document.createElement('div');
+    inner.className = 'stage__inner';
+    inner.appendChild(cfg.media(item));
+    card.appendChild(inner);
+
+    const activate = () => { if (!swiped) cfg.open(item, i); };
+    card.addEventListener('click', activate);
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
+    });
+
+    stage.appendChild(card);
+    cards.push(card);
+  });
+
+  const signedDist = i => {
+    const d = (i - current) % N;
+    return d > N / 2 ? d - N : d < -N / 2 ? d + N : d;
+  };
+  const reach = () => Math.ceil((innerWidth / 2) / (cardW * 0.55)) + 1;
+
+  function render() {
+    const spacing = cardW * 0.55;
+    const maxSide = reach();
+    for (let i = 0; i < N; i++) {
+      const d = signedDist(i), abs = Math.abs(d), card = cards[i];
+      const scale = Math.pow(0.9, abs);
+      const ry = d === 0 ? 0 : (d > 0 ? -13 : 13) * SIDE;
+      card.style.zIndex = 60 - abs;
+      card.style.opacity = abs > maxSide ? '0' : '1';
+      card.style.pointerEvents = abs > maxSide ? 'none' : 'auto';
+      card.style.transform =
+        `translateY(-50%) translateX(${d * spacing * SIDE}px) scale(${scale}) rotateY(${ry}deg)`;
+    }
+    if (cfg.caption) cfg.caption(cfg.items[current]);
+  }
+
+  function layout() {
+    const h = stage.getBoundingClientRect().height;
+    const narrow = innerWidth <= 640;
+    cardW = Math.max(
+      narrow ? 120 : 160,
+      Math.min(h * 0.86 * cfg.ratio, innerWidth * (narrow ? 0.42 : 0.62), 330)
+    );
+    stage.style.setProperty('--card-w', cardW + 'px');
+    render();
+  }
+
+  /* Only the cards inside the arc get a source; the rest stay idle. */
+  let settle = 0;
+  function sync() {
+    const maxSide = reach();
+    for (let i = 0; i < N; i++) {
+      if (cfg.onNear) cfg.onNear(cards[i], Math.abs(signedDist(i)) <= maxSide);
+    }
+  }
+  function go(dir) {
+    current = (current + dir + N) % N;
+    render();
+    clearTimeout(settle);
+    settle = setTimeout(sync, 260);
+  }
+
+  $(cfg.next).addEventListener('click', () => go(1));
+  $(cfg.prev).addEventListener('click', () => go(-1));
+
+  let startX = null;
+  stage.addEventListener('pointerdown', e => { startX = e.clientX; });
+  stage.addEventListener('pointerup', e => {
+    if (startX === null) return;
+    const dx = e.clientX - startX;
+    startX = null;
+    if (Math.abs(dx) < 40) return;
+    swiped = true;
+    go(dx * SIDE < 0 ? 1 : -1);
+    setTimeout(() => { swiped = false; }, 100);
+  });
+
+  layout();
+  sync();
+  addEventListener('resize', () => { layout(); sync(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) sync(); });
+}
+
+/* ═══════════════ featured reels ═══════════════ */
 {
   const picks = WORK.filter(p => p.featured).sort((a, b) => a.featured - b.featured);
+  const cap = $('#stageCap');
 
-  /* Rows group by orientation so every card in a row is the same height:
-     wide films two-up, vertical films as one even strip. */
-  const wide = picks.filter(p => p.orient === 'h');
-  const tall = picks.filter(p => p.orient === 'v');
-  const rows = [];
-  for (let i = 0; i < wide.length; i += 2) rows.push({ kind: 'pair', items: wide.slice(i, i + 2) });
-  if (tall.length) rows.push({ kind: 'strip', items: tall });
+  buildArc({
+    stage: '#stage', prev: '#stagePrev', next: '#stageNext',
+    ratio: 9 / 16,
+    items: picks,
+    label: p => `${p.title} — ${p.client}`,
+    media: p => {
+      const v = document.createElement('video');
+      v.poster = `assets/posters/${p.slug}.jpg`;
+      v.dataset.src = `assets/preview/${p.slug}.mp4`;
+      v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'none';
+      return v;
+    },
+    onNear: (card, near) => {
+      const v = $('video', card);
+      if (!v) return;
+      if (near && !CALM) {
+        if (!v.src) v.src = v.dataset.src;
+        if (v.paused) v.play().catch(() => {});
+      } else if (!v.paused) {
+        v.pause();
+      }
+    },
+    caption: p => {
+      if (!cap) return;
+      cap.innerHTML = `<b>${p.title}</b><span>${catName(p.cat)} · ${p.client}</span>`;
+    },
+    open: p => openWork(p.slug, true),
+  });
+}
 
-  let n = 0;
-  $('#featured').innerHTML = rows.map(row => {
-    const cells = row.items.map(p =>
-      cardHTML(p, ++n, false).replace('class="card', `class="${p.orient === 'h' ? 'big' : 'tall'} card`)
-    );
-    return `<div class="feat-row ${row.kind}">${cells.join('')}</div>`;
-  }).join('');
+/* ═══════════════ stills ═══════════════ */
+{
+  const cap = $('#stillsCap');
+
+  buildArc({
+    stage: '#stills', prev: '#stillsPrev', next: '#stillsNext',
+    ratio: 3 / 4,
+    items: STILLS,
+    label: s => `${s.title} — ${s.client}`,
+    media: s => {
+      const img = document.createElement('img');
+      img.alt = `${s.title} — ${s.client}`;
+      img.dataset.src = `assets/stills/card/${s.slug}.jpg`;
+      img.decoding = 'async';
+      img.draggable = false;
+      return img;
+    },
+    onNear: (card, near) => {
+      const img = $('img', card);
+      if (near && img && !img.src) img.src = img.dataset.src;
+    },
+    caption: s => {
+      if (!cap) return;
+      cap.innerHTML = `<b>${s.title}</b><span>${s.cat} · ${s.client}</span>`;
+    },
+    open: s => openPhoto(s),
+  });
+}
+
+/* ═══════════════ photo lightbox ═══════════════ */
+const photoBox = $('#photoBox');
+let photoReturn = null;
+
+function openPhoto(s) {
+  if (!photoBox) return;
+  photoReturn = document.activeElement;
+  $('#photoImg').src = `assets/stills/full/${s.slug}.jpg`;
+  $('#photoImg').alt = `${s.title} — ${s.client}`;
+  $('#photoCap').innerHTML = `<b>${s.title}</b><span>${s.cat} · ${s.client}</span>`;
+  photoBox.hidden = false;
+  document.body.classList.add('locked');
+  void photoBox.offsetHeight;
+  photoBox.classList.add('open');
+  $('#photoClose').focus({ preventScroll: true });
+}
+
+function closePhoto() {
+  if (!photoBox || photoBox.hidden) return;
+  photoBox.classList.remove('open');
+  document.body.classList.remove('locked');
+  setTimeout(() => {
+    if (!photoBox.classList.contains('open')) { photoBox.hidden = true; $('#photoImg').removeAttribute('src'); }
+  }, 200);
+  if (photoReturn) photoReturn.focus({ preventScroll: true });
+}
+
+if (photoBox) {
+  $('#photoClose').addEventListener('click', closePhoto);
+  photoBox.addEventListener('click', e => { if (e.target === photoBox) closePhoto(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && !photoBox.hidden) closePhoto(); });
 }
 
 /* ═══════════════ archive ═══════════════ */
